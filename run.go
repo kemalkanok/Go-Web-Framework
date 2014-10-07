@@ -1,36 +1,18 @@
 package main
 
 import (
+
+	"net/http"
 	"fmt"
-	"net"
-	"os"
-	
+
 )
-
-func main() {
-
-	service := ":1200"
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
-	checkError(err)
-
-	listener, err := net.ListenTCP("tcp", tcpAddr)
-	checkError(err)
-
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			continue
-		}
-
-		result := "test"
-		conn.Write([]byte(result)) // don't care about return value
-		conn.Close()                // we're finished with this client
-	}
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
-func checkError(err error) {
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
-		os.Exit(1)
-	}
+func main() {
+    http.HandleFunc("/", handler)
+    //running the server
+
+    http.ListenAndServe(":8080", nil)
 }
